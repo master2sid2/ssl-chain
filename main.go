@@ -33,6 +33,12 @@ func cyan(s string) string   { return colorCyan + s + colorReset }
 func bold(s string) string   { return colorBold + s + colorReset }
 func dim(s string) string    { return colorDim + s + colorReset }
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 type FileType int
 
 const (
@@ -50,6 +56,13 @@ type ParsedFile struct {
 }
 
 func main() {
+	if len(os.Args) >= 2 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
+		fmt.Printf("ssl_chain %s\n", bold(version))
+		fmt.Printf("  commit : %s\n", dim(commit))
+		fmt.Printf("  built  : %s\n", dim(date))
+		os.Exit(0)
+	}
+
 	if len(os.Args) < 2 {
 		printUsage()
 		os.Exit(1)
@@ -450,8 +463,8 @@ func printUsage() {
 	fmt.Fprintf(os.Stderr, "Usage:\n")
 	fmt.Fprintf(os.Stderr, "  ssl_chain chain.pem                    # chain check (single PEM with multiple certs)\n")
 	fmt.Fprintf(os.Stderr, "  ssl_chain cert.crt [intermediate.crt]  # chain check (separate files)\n")
-	fmt.Fprintf(os.Stderr, "  ssl_chain cert.crt cert.key            # key match check\n")
-	fmt.Fprintf(os.Stderr, "  ssl_chain cert.crt cert.key            # key match (prompts if encrypted)\n")
+	fmt.Fprintf(os.Stderr, "  ssl_chain cert.crt cert.key            # key match (prompts password if encrypted)\n")
+	fmt.Fprintf(os.Stderr, "  ssl_chain --version                    # show version\n")
 }
 
 func shortName(name string) string {
