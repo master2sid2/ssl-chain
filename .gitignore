@@ -1,2 +1,3 @@
-tmp/*
-build/*
+/ssl-chain
+/bin/
+/dist/

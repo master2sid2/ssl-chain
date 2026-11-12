@@ -1,35 +1,52 @@
-# Read version from VERSION file
+GO      ?= go
 VERSION := $(shell cat VERSION)
-COMMIT  := $(shell git rev-parse --short HEAD 2>/dev/null || echo "none")
+COMMIT  := $(shell git rev-parse --short HEAD 2>/dev/null || echo none)
 DATE    := $(shell date -u +%Y-%m-%d)
 
-BINARY  := ssl_chain
-LDFLAGS := -ldflags "-X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.date=$(DATE)"
+BINARY  := ssl-chain
+PREFIX  ?= /usr/local
+LDFLAGS := -s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.date=$(DATE)
+BUILD   := CGO_ENABLED=0 $(GO) build -trimpath -ldflags "$(LDFLAGS)"
 
-# ─── Targets ──────────────────────────────────────────────────────────────────
+PLATFORMS := linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64
 
-.PHONY: build clean install version help
+.PHONY: build install test lint dist clean version help
 
-## build: compile the binary
+## build:   compile bin/ssl-chain
 build:
-	go build $(LDFLAGS) -o build/bin/$(BINARY)-v$(VERSION) .
+	$(BUILD) -o bin/$(BINARY) .
 
-## install: install to /usr/local/bin
+## install: build and copy to $(PREFIX)/bin
 install: build
-	install -m 0755 $(BINARY) /usr/local/bin/$(BINARY)
+	install -m 0755 bin/$(BINARY) $(PREFIX)/bin/$(BINARY)
 
-## clean: remove built binary
+## test:    run unit tests
+test:
+	$(GO) test ./...
+
+## lint:    go vet and gofmt check
+lint:
+	$(GO) vet ./...
+	@test -z "$$(gofmt -l .)" || { gofmt -l .; exit 1; }
+
+## dist:    release binaries for all platforms in dist/
+dist:
+	@for p in $(PLATFORMS); do \
+		os=$${p%/*}; arch=$${p#*/}; ext=; [ $$os = windows ] && ext=.exe; \
+		out=dist/$(BINARY)-v$(VERSION)-$$os-$$arch$$ext; echo $$out; \
+		GOOS=$$os GOARCH=$$arch $(BUILD) -o $$out . || exit 1; \
+	done
+
+## clean:   remove build output
 clean:
-	rm -f build/bin/$(BINARY)-v$(VERSION)
+	rm -f bin/$(BINARY) dist/$(BINARY)-*
 
-## version: print current version
+## version: print version info
 version:
 	@echo "Version : $(VERSION)"
 	@echo "Commit  : $(COMMIT)"
 	@echo "Date    : $(DATE)"
 
-## help: show this help
+## help:    list targets
 help:
-	@echo "Usage: make [target]"
-	@echo ""
 	@grep -E '^## ' Makefile | sed 's/## /  /'
