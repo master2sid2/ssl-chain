@@ -29,7 +29,9 @@ func writeFile(t *testing.T, path string, data []byte) {
 func pemBytes(blocks ...*pem.Block) []byte {
 	var buf bytes.Buffer
 	for _, b := range blocks {
-		pem.Encode(&buf, b)
+		if err := pem.Encode(&buf, b); err != nil {
+			panic(err) // only fails on malformed headers, which tests never build
+		}
 	}
 	return buf.Bytes()
 }

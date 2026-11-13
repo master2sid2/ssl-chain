@@ -155,8 +155,9 @@ func usage(w io.Writer) {
 func buildInfo() (v, c, d string) {
 	v, c, d = version, commit, date
 	if bi, ok := debug.ReadBuildInfo(); ok {
-		if v == "dev" && bi.Main.Version != "" && bi.Main.Version != "(devel)" {
-			v = strings.TrimPrefix(bi.Main.Version, "v")
+		// A tagged release ("v0.1.0"), not a pseudo-version of an untagged build.
+		if mv := bi.Main.Version; v == "dev" && mv != "(devel)" && mv != "" && !strings.Contains(mv, "-") {
+			v = strings.TrimPrefix(mv, "v")
 		}
 		for _, s := range bi.Settings {
 			switch s.Key {

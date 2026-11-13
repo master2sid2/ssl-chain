@@ -1,5 +1,10 @@
 # ssl-chain
 
+[![CI](https://github.com/master2sid2/ssl-chain/actions/workflows/ci.yml/badge.svg)](https://github.com/master2sid2/ssl-chain/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/master2sid2/ssl-chain)](https://github.com/master2sid2/ssl-chain/releases)
+[![Go](https://img.shields.io/github/go-mod/go-version/master2sid2/ssl-chain)](go.mod)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A small CLI that answers a few questions about TLS files before you deploy
 them:
 
@@ -216,8 +221,9 @@ make install    # copy to /usr/local/bin (PREFIX=... to change)
 make dist       # release binaries for Linux, macOS and Windows in dist/
 ```
 
-To release a new version, bump `VERSION`, tag the commit `v<version>` and run
-`make dist`.
+Releases on GitHub are built by [GoReleaser](https://goreleaser.com) in GitHub
+Actions when a `v*` tag is pushed; the tag must match the `VERSION` file.
+`make dist` builds the same binaries locally.
 
 ## Layout
 
