@@ -15,6 +15,8 @@ them:
 
 It reads local files only and never connects anywhere.
 
+![ssl-chain checking a full chain, a broken chain, and a certificate with its CSR and key](docs/demo/ssl-chain.gif)
+
 ## Install
 
 ```bash
@@ -219,6 +221,7 @@ make test       # unit tests
 make lint       # go vet and gofmt check
 make install    # copy to /usr/local/bin (PREFIX=... to change)
 make dist       # release binaries for Linux, macOS and Windows in dist/
+make demo       # re-record docs/demo/ssl-chain.gif with VHS (needs Docker)
 ```
 
 Releases on GitHub are built by [GoReleaser](https://goreleaser.com) in GitHub

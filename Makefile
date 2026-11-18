@@ -10,7 +10,7 @@ BUILD   := CGO_ENABLED=0 $(GO) build -trimpath -ldflags "$(LDFLAGS)"
 
 PLATFORMS := linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64
 
-.PHONY: build install test lint dist clean version help
+.PHONY: build install test lint dist demo clean version help
 
 ## build:   compile bin/ssl-chain
 build:
@@ -36,6 +36,11 @@ dist:
 		out=dist/$(BINARY)-v$(VERSION)-$$os-$$arch$$ext; echo $$out; \
 		GOOS=$$os GOARCH=$$arch $(BUILD) -o $$out . || exit 1; \
 	done
+
+## demo:    record docs/demo/ssl-chain.gif with VHS (needs Docker)
+demo: build
+	docker run --rm --shm-size=1g --user $$(id -u):$$(id -g) -e HOME=/tmp -v $(CURDIR):/vhs -w /vhs \
+		ghcr.io/charmbracelet/vhs:v0.12.1 docs/demo/ssl-chain.tape
 
 ## clean:   remove build output
 clean:
